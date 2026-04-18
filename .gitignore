@@ -13,3 +13,6 @@ pnpm-debug.log*
 
 .DS_Store
 Thumbs.db
+
+# postgresql://neondb_owner:npg_ARCQ7T6JLPdF@ep-broad-mud-amzh4wxd.c-5.us-east-1.aws.neon.tech/neondb?sslmode=require
+# https://my-portfolio-pyxx.onrender.com
