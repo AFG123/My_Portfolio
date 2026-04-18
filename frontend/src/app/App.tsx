@@ -1,31 +1,37 @@
-import { Github, Linkedin, Mail, Terminal, ChevronDown } from "lucide-react";
+import { Download, Github, Linkedin, Mail, Terminal, ChevronDown } from "lucide-react";
+import { useEffect } from "react";
+import { trackPortfolioEvent, trackResumeDownload } from "../lib/api";
+import { ContactForm } from "./components/ContactForm";
 import { ProjectCard } from "./components/ProjectCard";
 import { SkillCategory } from "./components/SkillCategory";
+import { SystemStats } from "./components/SystemStats";
 
 export default function App() {
   const projects = [
     {
-      title: "real-time chat system",
-      problem: "Needed a scalable messaging platform for distributed teams",
-      solution: "Built WebSocket-based chat with Redis pub/sub, handling 10k+ concurrent connections",
-      techStack: ["Node.js", "Redis", "WebSocket", "React"],
-      liveLink: "#",
-      githubLink: "#"
+      slug: "vendex-ecommerce-platform",
+      title: "vendex ecommerce platform",
+      problem: "Building a storefront requires more than product pages. It needs authentication, order flows, admin controls, and a structure that stays maintainable as features grow.",
+      solution: "Built a PHP and MySQL ecommerce platform with separate user and admin panels, product and order management, coupon handling, digital downloads, and an MVC-style structure for cleaner backend organization.",
+      techStack: ["PHP", "MySQL", "Bootstrap", "MVC"],
+      githubLink: "https://github.com/AFG123/FullStack_Ecommerce"
     },
     {
-      title: "task automation CLI",
-      problem: "Repetitive deployment workflows wasting developer time",
-      solution: "Created CLI tool automating builds, tests, and deployments with rollback support",
-      techStack: ["Python", "Docker", "Bash", "CI/CD"],
-      githubLink: "#"
+      slug: "wedding-website-preview-platform",
+      title: "wedding website preview platform",
+      problem: "A freelance client needed a catalog-style website that could present card designs cleanly while still being easy to manage from the backend.",
+      solution: "Built a PHP-based wedding card preview platform with an admin dashboard, product and category management, reusable backend functions, and an API layer to serve dynamic product content to the frontend.",
+      techStack: ["PHP", "MySQL", "JavaScript", "REST API"],
+      liveLink: "https://houseofcards.in/",
+      githubLink: "https://github.com/AFG123/WebsitePreview"
     },
     {
-      title: "inventory tracker",
-      problem: "Local gym needed simple equipment tracking without complex software",
-      solution: "Lightweight progressive web app with offline support and barcode scanning",
-      techStack: ["TypeScript", "IndexedDB", "PWA", "Tailwind"],
-      liveLink: "#",
-      githubLink: "#"
+      slug: "personalbrain-assistant-ui",
+      title: "personalbrain assistant ui",
+      problem: "Local AI workflows are powerful, but using them from the terminal alone makes document-based retrieval and interaction harder to use day to day.",
+      solution: "Added a Flask web interface on top of a local retrieval pipeline, exposing a chat endpoint that reuses existing search and prompt logic to answer questions from indexed documents.",
+      techStack: ["Python", "Flask", "Ollama", "Vector Search"],
+      githubLink: "https://github.com/AFG123/PersonalBrain"
     }
   ];
 
@@ -64,6 +70,16 @@ export default function App() {
   const scrollToSection = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   };
+
+  useEffect(() => {
+    void trackPortfolioEvent({
+      eventType: "page_view",
+      path: window.location.pathname,
+      metadata: {
+        referrer: document.referrer || null,
+      },
+    });
+  }, []);
 
   return (
     <div className="min-h-screen bg-black text-gray-300">
@@ -113,13 +129,27 @@ export default function App() {
             </div>
           </div>
 
-          <div className="text-center">
+          <SystemStats />
+
+          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <button
               onClick={() => scrollToSection("projects")}
               className="font-mono px-6 py-3 border-2 border-[#00ff41] text-[#00ff41] hover:bg-[#00ff41] hover:text-black transition-all"
             >
               View Projects
             </button>
+
+            <a
+              href="/resume.pdf"
+              download
+              onClick={() => {
+                void trackResumeDownload("hero");
+              }}
+              className="inline-flex items-center gap-2 font-mono px-6 py-3 border border-[#00ff41]/40 text-gray-300 hover:bg-[#00ff41]/10 hover:border-[#00ff41] hover:text-[#00ff41] transition-all"
+            >
+              <Download className="w-4 h-4" />
+              <span>Download Resume</span>
+            </a>
           </div>
         </div>
         <button
@@ -136,25 +166,21 @@ export default function App() {
           <h2 className="font-mono text-2xl text-[#00ff41] mb-8">
             <span className="text-[#00ff41]/60">$</span> cat about.txt
           </h2>
-          <div className="max-w-2xl space-y-6 font-mono text-base leading-8 text-gray-400">
+          <div className="max-w-2xl space-y-5 font-mono text-base leading-8 text-gray-400">
             <p>
-              I&apos;m a backend developer focused on <span className="text-[#00ff41]">building systems</span>, not just writing code. My approach goes beyond implementation. I think in terms of architecture, data flow, and how each component interacts under real-world conditions.
+              I&apos;m a backend developer focused on <span className="text-[#00ff41]">building systems that solve real problems</span>. I care about how data moves, how components interact, and whether the software still makes sense once it grows beyond the first version.
             </p>
 
             <p>
-              I believe good software is defined by purpose. Before building anything, I question why it should exist, what problem it solves, and how it behaves when things go wrong. Designing for edge cases and failure scenarios is not an afterthought. It&apos;s a core part of how I work.
+              Most of my work is around APIs, backend flows, database-driven applications, and the logic behind admin and user-facing systems. I like building software that is clear in structure, practical in use, and maintainable over time.
             </p>
 
             <p>
-              My work reflects a systems-first mindset, from structuring scalable APIs to handling concurrency, data consistency, and performance under load. I focus on creating solutions that are not only functional, but reliable and maintainable over time.
-            </p>
-
-            <p>
-              I&apos;m self-taught, which means I&apos;ve learned by building, breaking, and refining real systems. That process shaped my discipline, attention to detail, and ability to stay consistent, principles I also apply outside of tech through boxing and training.
+              I&apos;m self-taught, so the way I learned was by building, breaking, and refining projects until they worked the way they should. That process shaped how I approach engineering: stay curious, keep the fundamentals strong, and build things that hold up in practice.
             </p>
 
             <p className="text-white">
-              I don&apos;t aim to build more code. I aim to build systems that actually hold up.
+              I&apos;m interested in backend roles where reliability, structure, and thoughtful problem-solving matter.
             </p>
           </div>
         </div>
@@ -201,20 +227,22 @@ export default function App() {
             </p>
           </div>
 
-          <p className="font-mono text-gray-400 mb-8">
+          <p className="mb-8 font-mono text-gray-400">
             Open to interesting projects and collaborations. Let&apos;s build something.
           </p>
 
+          <ContactForm />
+
           <div className="flex flex-wrap gap-4">
             <a
-              href="mailto:aryan@example.com"
+              href="mailto:aryan123damai@gmail.com"
               className="flex items-center gap-2 font-mono px-5 py-3 border-2 border-[#00ff41] text-[#00ff41] hover:bg-[#00ff41] hover:text-black transition-all"
             >
               <Mail className="w-4 h-4" />
               <span>Email Me</span>
             </a>
             <a
-              href="https://github.com"
+              href="https://github.com/AFG123"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 font-mono px-5 py-3 border border-[#00ff41]/40 text-gray-300 hover:bg-[#00ff41]/10 hover:border-[#00ff41] hover:text-[#00ff41] transition-all"
@@ -223,7 +251,7 @@ export default function App() {
               <span>GitHub</span>
             </a>
             <a
-              href="https://linkedin.com"
+              href="https://www.linkedin.com/in/aryan-damai"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 font-mono px-5 py-3 border border-[#00ff41]/40 text-gray-300 hover:bg-[#00ff41]/10 hover:border-[#00ff41] hover:text-[#00ff41] transition-all"
