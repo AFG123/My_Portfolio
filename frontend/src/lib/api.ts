@@ -1,3 +1,5 @@
+import { fetchWithRetry } from "./fetchWithRetry";
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
 
 export interface ContactFormPayload {
@@ -13,7 +15,7 @@ interface ApiResponse {
 }
 
 export interface PortfolioEventPayload {
-  eventType: "page_view" | "project_github_click" | "project_live_click";
+  eventType: "page_view" | "project_click";
   path: string;
   projectSlug?: string;
   metadata?: Record<string, unknown>;
@@ -28,7 +30,7 @@ export interface PortfolioStats {
 }
 
 export async function submitContactForm(payload: ContactFormPayload) {
-  const response = await fetch(`${API_BASE_URL}/api/contact`, {
+  const response = await fetchWithRetry(`${API_BASE_URL}/api/contact`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -47,7 +49,12 @@ export async function submitContactForm(payload: ContactFormPayload) {
 
 export async function trackPortfolioEvent(payload: PortfolioEventPayload) {
   try {
-    await fetch(`${API_BASE_URL}/api/events`, {
+    const route =
+      payload.eventType === "page_view"
+        ? "/track/page-view"
+        : "/track/project-click";
+
+    await fetchWithRetry(`${API_BASE_URL}${route}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -60,7 +67,7 @@ export async function trackPortfolioEvent(payload: PortfolioEventPayload) {
 }
 
 export async function fetchPortfolioStats() {
-  const response = await fetch(`${API_BASE_URL}/api/stats`);
+  const response = await fetchWithRetry(`${API_BASE_URL}/api/stats`);
   const data = (await response.json()) as { ok: boolean; data?: PortfolioStats; error?: string };
 
   if (!response.ok || !data.data) {
@@ -72,7 +79,7 @@ export async function fetchPortfolioStats() {
 
 export async function trackResumeDownload(source: string) {
   try {
-    await fetch(`${API_BASE_URL}/api/resume/download`, {
+    await fetchWithRetry(`${API_BASE_URL}/track/resume-download`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

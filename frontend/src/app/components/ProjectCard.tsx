@@ -48,10 +48,10 @@ export function ProjectCard({ title, problem, solution, techStack, slug, liveLin
             rel="noopener noreferrer"
             onClick={() => {
               void trackPortfolioEvent({
-                eventType: "project_live_click",
+                eventType: "project_click",
                 path: window.location.pathname,
                 projectSlug: slug,
-                metadata: { target: liveLink },
+                metadata: { target: liveLink, linkType: "live" },
               });
             }}
             className="flex items-center gap-2 font-mono text-xs px-3 py-2 border border-[#00ff41] text-[#00ff41] hover:bg-[#00ff41] hover:text-black transition-all"
@@ -67,10 +67,10 @@ export function ProjectCard({ title, problem, solution, techStack, slug, liveLin
             rel="noopener noreferrer"
             onClick={() => {
               void trackPortfolioEvent({
-                eventType: "project_github_click",
+                eventType: "project_click",
                 path: window.location.pathname,
                 projectSlug: slug,
-                metadata: { target: githubLink },
+                metadata: { target: githubLink, linkType: "github" },
               });
             }}
             className="flex items-center gap-2 font-mono text-xs px-3 py-2 border border-[#00ff41]/40 text-gray-400 hover:border-[#00ff41] hover:text-[#00ff41] transition-all"
