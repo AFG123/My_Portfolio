@@ -267,7 +267,7 @@ export default function App() {
       <footer className="border-t border-[#00ff41]/10 py-8 px-6">
         <div className="max-w-5xl mx-auto text-center">
           <p className="font-mono text-sm text-gray-600">
-            Built with React & Tailwind CSS · No frameworks, just fundamentals
+            A portfolio powered by real APIs, tracking, and PostgreSQL
           </p>
         </div>
       </footer>
