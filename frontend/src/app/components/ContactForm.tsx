@@ -34,7 +34,7 @@ export function ContactForm() {
     <div className="mb-8 border border-[#00ff41]/20 bg-black/40 p-6">
       <div className="mb-4 font-mono text-sm text-[#00ff41]/70">
         <span className="text-[#00ff41]/50">$ </span>
-        send_message --secure
+        send_message
       </div>
 
       <form className="space-y-4" onSubmit={handleSubmit}>

@@ -11,15 +11,18 @@ const fallbackStats: PortfolioStats = {
 
 export function SystemStats() {
   const [stats, setStats] = useState<PortfolioStats>(fallbackStats);
+  const [responseTimeMs, setResponseTimeMs] = useState<number | null>(null);
 
   useEffect(() => {
     let isMounted = true;
 
     async function loadStats() {
+      const startedAt = Date.now();
       try {
         const data = await fetchPortfolioStats();
         if (isMounted) {
           setStats(data);
+          setResponseTimeMs(Date.now() - startedAt);
         }
       } catch {
         if (isMounted) {
@@ -40,7 +43,13 @@ export function SystemStats() {
     { label: "project_clicks", value: stats.projectClicks },
     { label: "messages_received", value: stats.messagesReceived },
     { label: "resume_downloads", value: stats.resumeDownloads },
-    { label: "api_status", value: stats.apiStatus },
+    {
+      label: "api_status",
+      value:
+        responseTimeMs === null
+          ? stats.apiStatus
+          : `${stats.apiStatus} · ${responseTimeMs}ms`,
+    },
   ];
 
   return (

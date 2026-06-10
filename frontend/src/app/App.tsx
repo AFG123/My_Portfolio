@@ -1,6 +1,7 @@
 import { Download, Github, Linkedin, Mail, Terminal, ChevronDown } from "lucide-react";
 import { useEffect } from "react";
 import { trackPortfolioEvent, trackResumeDownload } from "../lib/api";
+import { ArchitectureSection } from "./components/ArchitectureSection";
 import { ContactForm } from "./components/ContactForm";
 import { ProjectCard } from "./components/ProjectCard";
 import { SkillCategory } from "./components/SkillCategory";
@@ -9,12 +10,13 @@ import { SystemStats } from "./components/SystemStats";
 export default function App() {
   const projects = [
     {
-      slug: "vendex-ecommerce-platform",
-      title: "vendex ecommerce platform",
-      problem: "Building a storefront requires more than product pages. It needs authentication, order flows, admin controls, and a structure that stays maintainable as features grow.",
-      solution: "Built a PHP and MySQL ecommerce platform with separate user and admin panels, product and order management, coupon handling, digital downloads, and an MVC-style structure for cleaner backend organization.",
-      techStack: ["PHP", "MySQL", "Bootstrap", "MVC"],
-      githubLink: "https://github.com/AFG123/FullStack_Ecommerce"
+      slug: "snipshare",
+      title: "snipshare",
+      problem: "Sharing code snippets safely needs more than a textbox. Links must expire, sensitive snippets need protection, and abandoned data shouldn't pile up in the database forever.",
+      solution: "Built a full-stack pastebin with short links, expiry, password protection, and burn-after-read. Designed per-endpoint rate limits to prevent abuse, token-based snippet management, and a cron job that cleans up expired snippets every 15 minutes.",
+      techStack: ["Node.js", "Express", "PostgreSQL", "React", "Rate Limiting"],
+      liveLink: "https://www.devbyaryan.me/",
+      githubLink: "https://github.com/AFG123/Snip-share"
     },
     {
       slug: "wedding-website-preview-platform",
@@ -40,29 +42,30 @@ export default function App() {
       category: "Backend",
       skills: [
         { name: "Node.js", highlight: true },
-        { name: "Python", highlight: true },
-        { name: "PostgreSQL", highlight: false },
-        { name: "Redis", highlight: true },
+        { name: "Express", highlight: true },
+        { name: "PostgreSQL", highlight: true },
         { name: "REST APIs", highlight: false },
-        { name: "WebSockets", highlight: false },
+        { name: "PHP", highlight: false },
+        { name: "MySQL", highlight: false },
+        { name: "Python (Flask)", highlight: false },
       ]
     },
     {
       category: "Frontend",
       skills: [
         { name: "React", highlight: true },
-        { name: "TypeScript", highlight: true },
         { name: "JavaScript", highlight: false },
+        { name: "TypeScript", highlight: false },
         { name: "Tailwind CSS", highlight: false },
       ]
     },
     {
-      category: "Systems",
+      category: "Tools",
       skills: [
-        { name: "Docker", highlight: true },
-        { name: "Linux/Bash", highlight: false },
-        { name: "Git", highlight: false },
-        { name: "CI/CD", highlight: false },
+        { name: "Git", highlight: true },
+        { name: "Vite", highlight: false },
+        { name: "Vercel deployments", highlight: false },
+        { name: "npm", highlight: false },
       ]
     }
   ];
@@ -91,7 +94,7 @@ export default function App() {
             <span className="font-mono text-sm text-[#00ff41]">~/portfolio</span>
           </div>
           <nav className="hidden md:flex gap-6">
-            {["about", "projects", "skills", "contact"].map((section) => (
+            {["about", "projects", "architecture", "skills", "contact"].map((section) => (
               <button
                 key={section}
                 onClick={() => scrollToSection(section)}
@@ -112,9 +115,9 @@ export default function App() {
               <span className="text-[#00ff41]/60">$ </span>
               <span className="text-gray-400">whoami</span>
             </div>
-            <div className="font-mono text-xl text-white pl-2">
+            <h1 className="font-mono text-xl text-white pl-2">
               Aryan Damai
-            </div>
+            </h1>
 
             <div className="font-mono text-sm mt-4">
               <span className="text-[#00ff41]/60">$ </span>
@@ -199,6 +202,9 @@ export default function App() {
           </div>
         </div>
       </section>
+
+      {/* Architecture Section */}
+      <ArchitectureSection />
 
       {/* Skills Section */}
       <section id="skills" className="py-20 px-6 border-t border-[#00ff41]/10">
