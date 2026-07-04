@@ -10,6 +10,15 @@ import { SystemStats } from "./components/SystemStats";
 export default function App() {
   const projects = [
     {
+      slug: "projectpilot",
+      title: "projectpilot",
+      problem: "CS students build repetitive portfolio projects and struggle to design production-ready applications from scratch.",
+      solution: "Built a SaaS that generates personalized project blueprints from a student's skills and target role — system architecture, database schema, REST endpoints, a phased build guide, deployment tips, and role-specific interview questions. Launched publicly with active users and a premium tier for detailed implementation guides.",
+      techStack: ["Node.js", "Express", "PostgreSQL", "SaaS"],
+      liveLink: "https://projectpilot.devbyaryan.me/",
+      githubLink: "https://github.com/AFG123/ProjectPilot"
+    },
+    {
       slug: "snipshare",
       title: "snipshare",
       problem: "Sharing code snippets safely needs more than a textbox. Links must expire, sensitive snippets need protection, and abandoned data shouldn't pile up in the database forever.",

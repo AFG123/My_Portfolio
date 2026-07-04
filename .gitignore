@@ -13,3 +13,6 @@ pnpm-debug.log*
 
 .DS_Store
 Thumbs.db
+
+# Personal resume master copy — never commit. The served copy lives at frontend/public/resume.pdf
+AryanResumeV5.pdf
