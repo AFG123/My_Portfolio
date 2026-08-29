@@ -37,44 +37,54 @@ export default function App() {
       githubLink: "https://github.com/AFG123/WebsitePreview"
     },
     {
-      slug: "personalbrain-assistant-ui",
-      title: "personalbrain assistant ui",
-      problem: "Local AI workflows are powerful, but using them from the terminal alone makes document-based retrieval and interaction harder to use day to day.",
-      solution: "Added a Flask web interface on top of a local retrieval pipeline, exposing a chat endpoint that reuses existing search and prompt logic to answer questions from indexed documents.",
-      techStack: ["Python", "Flask", "Ollama", "Vector Search"],
-      githubLink: "https://github.com/AFG123/PersonalBrain"
+      slug: "reachinbox-email-scheduler",
+      title: "reachinbox email scheduler",
+      problem: "Scheduling cold email campaigns reliably is difficult when server restarts interrupt cron jobs, and lack of rate-limiting/concurrency control leads to duplicate sending or email provider blocks.",
+      solution: "Built a full-stack email scheduler using BullMQ and Redis for persistent delayed jobs that survive restarts. Implemented Redis-backed hourly rate limiting per sender and database-tracked job states to prevent duplicate processing across concurrent workers. Integrated Google OAuth and a live status dashboard.",
+      techStack: ["TypeScript", "Express.js", "PostgreSQL", "Prisma", "BullMQ", "Redis", "React"],
+      liveLink: "https://reachinbox-email-scheduler-gules.vercel.app",
+      githubLink: "https://github.com/AFG123/reachinbox-email-scheduler"
     }
   ];
 
   const skillCategories = [
     {
-      category: "Backend",
+      category: "Backend & Databases",
       skills: [
         { name: "Node.js", highlight: true },
-        { name: "Express", highlight: true },
+        { name: "Express.js", highlight: true },
         { name: "PostgreSQL", highlight: true },
-        { name: "REST APIs", highlight: false },
-        { name: "PHP", highlight: false },
+        { name: "MongoDB", highlight: false },
+        { name: "Redis / BullMQ", highlight: true },
         { name: "MySQL", highlight: false },
-        { name: "Python (Flask)", highlight: false },
+        { name: "REST APIs", highlight: false },
+        { name: "Schema Design", highlight: false },
       ]
     },
     {
-      category: "Frontend",
+      category: "Languages & Security",
+      skills: [
+        { name: "TypeScript", highlight: true },
+        { name: "JavaScript", highlight: false },
+        { name: "Java (DSA)", highlight: false },
+        { name: "Python / PHP", highlight: false },
+        { name: "JWT Auth", highlight: false },
+        { name: "RBAC", highlight: true },
+        { name: "MVC Architecture", highlight: false },
+        { name: "Input Validation", highlight: false },
+      ]
+    },
+    {
+      category: "Tools & Frontend",
       skills: [
         { name: "React", highlight: true },
-        { name: "JavaScript", highlight: false },
-        { name: "TypeScript", highlight: false },
         { name: "Tailwind CSS", highlight: false },
-      ]
-    },
-    {
-      category: "Tools",
-      skills: [
-        { name: "Git", highlight: true },
-        { name: "Vite", highlight: false },
-        { name: "Vercel deployments", highlight: false },
-        { name: "npm", highlight: false },
+        { name: "Git & GitHub", highlight: true },
+        { name: "Postman", highlight: false },
+        { name: "Jira", highlight: false },
+        { name: "Linux", highlight: false },
+        { name: "Microsoft Azure", highlight: false },
+        { name: "Vercel", highlight: false },
       ]
     }
   ];
