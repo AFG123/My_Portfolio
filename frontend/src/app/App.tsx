@@ -162,7 +162,7 @@ export default function App() {
             </button>
 
             <a
-              href="/resume.pdf"
+              href="/Aryan_Backend_Resume.pdf"
               download
               onClick={() => {
                 void trackResumeDownload("hero");
