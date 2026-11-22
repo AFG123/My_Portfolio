@@ -43,6 +43,8 @@
 .index-card p { min-height: 72px; color: var(--muted); font-size: 14px; line-height: 1.6; }
 .index-card .tag-row { margin-bottom: 25px; }
 .index-card .project-index-links { margin-top: auto; }
+.index-case-link { display: inline-flex; align-items: center; gap: 6px; width: fit-content; margin: 0 0 18px; color: var(--accent); font-size: 14px; font-weight: 600; }
+.index-case-link:hover, .index-case-link:focus-visible { color: var(--accent-strong); }
 .case-pending { display: block; margin-top: 23px; padding-top: 17px; border-top: 1px solid var(--line); color: var(--subtle); font-size: 10px; }
 .case-page { padding-bottom: 100px; }
 .case-hero { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(270px, .5fr); gap: 8%; align-items: end; padding: 70px 0 92px; }
@@ -71,6 +73,35 @@
 .case-bottom-nav { display: flex; justify-content: space-between; gap: 20px; padding-top: 35px; border-top: 1px solid var(--line); }
 .case-bottom-nav a { display: inline-flex; align-items: center; gap: 9px; color: var(--accent); font-size: 14px; font-weight: 600; }
 .case-bottom-nav a:hover { color: var(--accent-strong); }
+.projectpilot-flow { border-top: 1px solid var(--line); scroll-margin-top: 98px; }
+.projectpilot-flow[data-mode="deep-dive"] { --accent: #ba9fff; --accent-strong: #dccfff; --accent-soft: rgba(186,159,255,.12); }
+:root[data-theme="light"] .projectpilot-flow[data-mode="deep-dive"] { --accent: #6949a8; --accent-strong: #56398e; --accent-soft: rgba(105,73,168,.1); }
+.projectpilot-flow-switch { display: flex; align-items: end; justify-content: space-between; gap: 24px; padding-top: 66px; }
+.projectpilot-flow-switch p { margin: 15px 0 0; color: var(--muted); line-height: 1.6; }
+.projectpilot-flow-switch > div { min-width: 0; }
+.projectpilot-mode-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+.projectpilot-mode-buttons button { display: inline-flex; align-items: center; gap: 9px; min-height: 42px; padding: 9px 14px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface); color: var(--subtle); font: 600 11px 'Geist Mono', monospace; transition: border-color .2s ease, color .2s ease, background .2s ease; }
+.projectpilot-mode-buttons button span { color: var(--text); font: 600 13px 'Geist', sans-serif; }
+.projectpilot-mode-buttons button:hover, .projectpilot-mode-buttons button:focus-visible, .projectpilot-mode-buttons button.is-current { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.projectpilot-branch-guide { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 27px; border-block: 1px solid var(--line); }
+.projectpilot-branch-guide > div { min-width: 0; padding: 17px 22px; border-right: 1px solid var(--line); }
+.projectpilot-branch-guide > div:first-child { padding-left: 0; }
+.projectpilot-branch-guide > div:last-child { border-right: 0; padding-right: 0; }
+.projectpilot-branch-guide span, .pilot-detail-area { display: block; color: var(--accent); font: 600 11px 'Geist Mono', monospace; letter-spacing: .07em; }
+.projectpilot-branch-guide p { margin: 8px 0 0; color: var(--muted); font-size: 14px; line-height: 1.6; }
+.projectpilot-flow .case-architecture { padding-top: 38px; border-top: 0; }
+.projectpilot-case .case-hero-meta span { font-size: 11px; }
+.projectpilot-case .case-hero-meta strong { font-size: 13px; }
+.projectpilot-case .architecture-edge-label { font-size: 12.5px; }
+.projectpilot-case .architecture-hint { font-size: 11px; }
+.projectpilot-case .architecture-stage-button { font-size: 13px; }
+.projectpilot-case .case-detail-list h3 { margin-top: 7px; }
+.projectpilot-case .case-detail-list p { font-size: 16px; }
+.pilot-cache-list { display: grid; gap: 0; margin-top: 26px; border-top: 1px solid var(--line); }
+.pilot-cache-list article { display: grid; grid-template-columns: minmax(145px, .8fr) minmax(180px, 1fr) minmax(0, 2.5fr); align-items: start; gap: 24px; padding: 24px 0; border-bottom: 1px solid var(--line); }
+.pilot-cache-list h3 { margin: 0; font-size: 18px; letter-spacing: -.03em; }
+.pilot-cache-list span { color: var(--accent); font: 500 12px 'Geist Mono', monospace; line-height: 1.5; }
+.pilot-cache-list p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.7; }
 .case-architecture { padding: 70px 0 76px; border-top: 1px solid var(--line); scroll-margin-top: 98px; }
 .case-architecture-heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 30px; }
 .case-architecture-heading h2 { margin: 17px 0 10px; }
@@ -142,6 +173,13 @@
   .case-hero-meta { grid-template-columns: repeat(3, 1fr); padding: 18px 0 0; border-left: 0; border-top: 1px solid var(--line); }
   .case-section { grid-template-columns: 1fr; gap: 20px; }
   .case-architecture-heading { display: block; }
+  .projectpilot-flow-switch { display: block; padding-top: 54px; }
+  .projectpilot-mode-buttons { margin-top: 22px; }
+  .projectpilot-branch-guide { grid-template-columns: 1fr; }
+  .projectpilot-branch-guide > div, .projectpilot-branch-guide > div:first-child, .projectpilot-branch-guide > div:last-child { padding: 14px 0; border-right: 0; border-bottom: 1px solid var(--line); }
+  .projectpilot-branch-guide > div:last-child { border-bottom: 0; }
+  .pilot-cache-list article { grid-template-columns: minmax(150px, 1fr) 2fr; gap: 10px 22px; }
+  .pilot-cache-list p { grid-column: 2; }
   .architecture-hint { display: block; margin-top: 18px; white-space: normal; }
 }
 @media (max-width: 600px) {
@@ -160,6 +198,11 @@
   .case-hero { padding: 56px 0 68px; }
   .case-hero-meta { grid-template-columns: 1fr; gap: 16px; }
   .case-section { padding: 54px 0; }
+  .projectpilot-mode-buttons { display: grid; grid-template-columns: 1fr; }
+  .projectpilot-mode-buttons button { width: 100%; }
+  .pilot-cache-list article { display: block; }
+  .pilot-cache-list span { display: block; margin-top: 5px; }
+  .pilot-cache-list p { margin-top: 11px; }
   .case-architecture { padding: 56px 0 64px; }
   .architecture-mobile-list { padding: 17px; }
   .mobile-architecture-node { display: block; }

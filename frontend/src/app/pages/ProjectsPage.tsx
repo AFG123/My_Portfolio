@@ -48,7 +48,7 @@ export function ProjectsPage() {
         {rest.map((project, index) => <article className="index-card" key={project.slug}>
           <div className="index-card-top"><span>0{index + 2} / {project.category}</span><ArrowUpRight size={19} /></div>
           <div className="index-card-glyph" aria-hidden="true">{project.glyph}</div>
-          <div className="index-card-content"><h3>{project.name}</h3><p>{project.summary}</p><div className="tag-row">{project.stack.map((tech) => <span key={tech}>{tech}</span>)}</div><ExternalLinks project={project} /><span className="case-pending">DETAILED CASE STUDY IN PREPARATION</span></div>
+          <div className="index-card-content"><h3>{project.name}</h3><p>{project.summary}</p><div className="tag-row">{project.stack.map((tech) => <span key={tech}>{tech}</span>)}</div>{project.slug === "projectpilot" && <Link className="index-case-link" to={`/projects/${project.slug}`}>Explore case study <ArrowRight size={15} /></Link>}<ExternalLinks project={project} />{project.slug !== "projectpilot" && <span className="case-pending">DETAILED CASE STUDY IN PREPARATION</span>}</div>
         </article>)}
       </div>
     </section>

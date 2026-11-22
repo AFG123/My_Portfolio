@@ -36,8 +36,8 @@ export function ArchitectureViewer({ config }: { config: ArchitectureConfig }) {
   const nodes = useMemo(() => new Map(config.nodes.map((node) => [node.id, node])), [config]);
   const primaryNodes = config.nodes.filter((node) => node.group !== "dependency");
   const step = config.steps[stepIndex];
-  const selected = selectedNode ? nodes.get(selectedNode) : null;
   const inspectedNode = hoveredNode ?? selectedNode;
+  const selected = inspectedNode ? nodes.get(inspectedNode) : null;
   const focusedStep = config.steps[hoveredStep ?? stepIndex];
   const activeEdges = inspectedNode
     ? config.edges.filter((edge) => edge.from === inspectedNode || edge.to === inspectedNode).map((edge) => edge.id)
@@ -88,11 +88,11 @@ export function ArchitectureViewer({ config }: { config: ArchitectureConfig }) {
     </div>
     <div className="architecture-workspace">
       <div className="architecture-canvas" role="group" aria-label={`${config.title} system architecture diagram`} ref={canvasRef}>
-        <div className="canvas-topline"><span>01 / REQUEST + STORAGE</span><span>02 / QUEUED DELIVERY</span></div>
+        <div className="canvas-topline"><span>{config.canvasLabels?.[0] ?? "01 / REQUEST + STORAGE"}</span><span>{config.canvasLabels?.[1] ?? "02 / QUEUED DELIVERY"}</span></div>
         <svg className="architecture-edges" viewBox="0 0 1000 500" preserveAspectRatio="none" aria-hidden="true">
           <defs>
-            <marker id={`${markerId}-idle`} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="var(--muted)" strokeWidth="1.7" /></marker>
-            <marker id={`${markerId}-active`} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="var(--accent)" strokeWidth="1.7" /></marker>
+            <marker id={`${markerId}-idle`} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="var(--muted)" strokeWidth="2" /></marker>
+            <marker id={`${markerId}-active`} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="var(--accent)" strokeWidth="2" /></marker>
           </defs>
           {config.edges.map((edge, index) => {
             const d = edgePath(edge, boxes);
@@ -111,7 +111,7 @@ export function ArchitectureViewer({ config }: { config: ArchitectureConfig }) {
           onClick={() => goToStep(index)} onMouseEnter={() => setHoveredStep(index)} onMouseLeave={() => setHoveredStep(null)} onFocus={() => setHoveredStep(index)} onBlur={() => setHoveredStep(null)} aria-label={`Step ${index + 1}: ${item.title}`} aria-current={stepIndex === index && !selectedNode ? "step" : undefined}
           title={item.title}>{String(index + 1).padStart(2, "0")}</button>)}
         {config.nodes.map((node) => <button type="button" key={node.id}
-          className={`architecture-node ${activeNodes.includes(node.id) ? "is-active" : ""} ${selectedNode === node.id ? "is-selected" : ""} ${node.group === "dependency" ? "is-dependency" : ""}`}
+          className={`architecture-node ${activeNodes.includes(node.id) ? "is-active" : ""} ${selectedNode === node.id && (!hoveredNode || hoveredNode === node.id) ? "is-selected" : ""} ${node.group === "dependency" ? "is-dependency" : ""}`}
           style={{ left: `${node.x}%`, top: `${node.y}%` }}
           data-architecture-node={node.id} onClick={() => selectNode(node.id)} onMouseEnter={() => setHoveredNode(node.id)} onMouseLeave={() => setHoveredNode(null)} onFocus={() => setHoveredNode(node.id)} onBlur={() => setHoveredNode(null)} aria-pressed={selectedNode === node.id}
           aria-label={`${node.label}: ${node.role}. Select for details`}>

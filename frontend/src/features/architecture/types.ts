@@ -36,6 +36,7 @@ export interface ArchitectureStep {
 export interface ArchitectureConfig {
   title: string;
   description: string;
+  canvasLabels?: [string, string];
   nodes: ArchitectureNode[];
   edges: ArchitectureEdge[];
   steps: ArchitectureStep[];

@@ -78,7 +78,7 @@ function Welcome({ onClose }: { onClose: () => void }) {
   </div>;
 }
 function ProjectLinks({ project }: { project: PortfolioProject }) {
-  return <div className="project-links">{project.slug === "reachinbox-email-scheduler" && <Link to={`/projects/${project.slug}`}>Case study <ArrowUpRight size={15} /></Link>}<a href={project.github} target="_blank" rel="noopener noreferrer" onClick={() => trackProject(project.slug, project.github, "github")}><Github size={16} /> GitHub <ArrowUpRight size={15} /></a>{project.demo && <a href={project.demo} target="_blank" rel="noopener noreferrer" onClick={() => trackProject(project.slug, project.demo!, "live")}>Live demo <ArrowUpRight size={15} /></a>}</div>;
+  return <div className="project-links">{["reachinbox-email-scheduler", "projectpilot"].includes(project.slug) && <Link to={`/projects/${project.slug}`}>Case study <ArrowUpRight size={15} /></Link>}<a href={project.github} target="_blank" rel="noopener noreferrer" onClick={() => trackProject(project.slug, project.github, "github")}><Github size={16} /> GitHub <ArrowUpRight size={15} /></a>{project.demo && <a href={project.demo} target="_blank" rel="noopener noreferrer" onClick={() => trackProject(project.slug, project.demo!, "live")}>Live demo <ArrowUpRight size={15} /></a>}</div>;
 }
 export default function App() {
   const [showWelcome, setShowWelcome] = useState(() => { try { return sessionStorage.getItem("portfolio-welcomed") !== "1" && !window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch { return false; } });
