@@ -41,7 +41,7 @@ export const projects: PortfolioProject[] = [
     name: "SnipShare",
     category: "Security / Data lifecycle",
     summary: "Share snippets with expiry, password protection, and burn-after-read access.",
-    detail: "A PostgreSQL transaction wraps burn-after-read access so concurrent requests cannot consume the same snippet twice.",
+    detail: "PostgreSQL stores snippets and expiry times. Burn-after-read deletes a snippet after access, but concurrent reads are not serialized.",
     stack: ["Node.js", "Express", "PostgreSQL", "React"],
     github: "https://github.com/AFG123/Snip-share",
     demo: "https://www.devbyaryan.me/",

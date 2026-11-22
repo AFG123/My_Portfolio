@@ -7,6 +7,7 @@ import { ArchitectureViewer } from "../../features/architecture/ArchitectureView
 import { reachInboxArchitecture } from "../../features/architecture/reachInbox";
 import { NotFoundPage } from "./NotFoundPage";
 import { ProjectPilotPage } from "./ProjectPilotPage";
+import { SnipSharePage } from "./SnipSharePage";
 
 const decisions = [
   { title: "Write first, enqueue second", detail: "A Prisma transaction creates the campaign and email records together. BullMQ jobs are added only after the database commit, so a rolled-back campaign cannot produce queued work." },
@@ -29,6 +30,7 @@ export function ProjectDetailPage() {
     document.querySelector('meta[name="description"]')?.setAttribute("content", "Explore the real architecture behind ReachInbox Email Scheduler: PostgreSQL scheduling, BullMQ delayed jobs, Redis sender limits, worker processing, and SMTP delivery.");
   }, [slug]);
   if (slug === "projectpilot") return <ProjectPilotPage />;
+  if (slug === "snipshare") return <SnipSharePage />;
   if (slug !== "reachinbox-email-scheduler") return <NotFoundPage unavailableProject={slug} />;
   const project = projects[0];
   function track(target: string, linkType: "github" | "live") {

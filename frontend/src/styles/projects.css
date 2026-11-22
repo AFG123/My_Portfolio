@@ -97,6 +97,21 @@
 .projectpilot-case .architecture-stage-button { font-size: 13px; }
 .projectpilot-case .case-detail-list h3 { margin-top: 7px; }
 .projectpilot-case .case-detail-list p { font-size: 16px; }
+.snipshare-flow[data-mode="lifecycle"] { --accent: #e7b46b; --accent-strong: #f4cf94; --accent-soft: rgba(231,180,107,.12); }
+:root[data-theme="light"] .snipshare-flow[data-mode="lifecycle"] { --accent: #8b5825; --accent-strong: #70441c; --accent-soft: rgba(139,88,37,.1); }
+.snipshare-case .architecture-edge-label { font-size: 12px; }
+.snipshare-case .architecture-node small { font-size: 11.5px; }
+.snipshare-case .case-detail-list h3 { margin-top: 7px; }
+.snipshare-case .case-detail-list p { font-size: 16px; }
+.snipshare-case .architecture-canvas { height: 620px; }
+.snipshare-case .architecture-step-pin { display: none; }
+.snipshare-case .case-architecture { display: flex; flex-direction: column; }
+.snipshare-case .architecture-toolbar { order: 1; padding: 0 0 16px; }
+.snipshare-case .architecture-workspace { order: 2; }
+.snipshare-case .architecture-access-note { order: 3; }
+.snipshare-route-guide { margin-top: 24px; }
+.snipshare-race-note { margin: 0; padding: 13px 0 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+.snipshare-race-note strong { color: var(--text); }
 .pilot-cache-list { display: grid; gap: 0; margin-top: 26px; border-top: 1px solid var(--line); }
 .pilot-cache-list article { display: grid; grid-template-columns: minmax(145px, .8fr) minmax(180px, 1fr) minmax(0, 2.5fr); align-items: start; gap: 24px; padding: 24px 0; border-bottom: 1px solid var(--line); }
 .pilot-cache-list h3 { margin: 0; font-size: 18px; letter-spacing: -.03em; }
