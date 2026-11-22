@@ -1,301 +1,131 @@
-import { Download, Github, Linkedin, Mail, Terminal, ChevronDown } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { flushSync } from "react-dom";
+import { ArrowUpRight, Check, ChevronDown, Download, Github, Linkedin, Mail, Menu, Moon, Pause, Play, RotateCcw, Sun, X } from "lucide-react";
 import { trackPortfolioEvent, trackResumeDownload } from "../lib/api";
-import { ArchitectureSection } from "./components/ArchitectureSection";
 import { ContactForm } from "./components/ContactForm";
-import { ProjectCard } from "./components/ProjectCard";
-import { SkillCategory } from "./components/SkillCategory";
 import { SystemStats } from "./components/SystemStats";
+import "../styles/homepage.css";
 
-export default function App() {
-  const projects = [
-    {
-      slug: "projectpilot",
-      title: "projectpilot",
-      problem: "CS students build repetitive portfolio projects and struggle to design production-ready applications from scratch.",
-      solution: "Built a SaaS that generates personalized project blueprints from a student's skills and target role — system architecture, database schema, REST endpoints, a phased build guide, deployment tips, and role-specific interview questions. Launched publicly with active users and a premium tier for detailed implementation guides.",
-      techStack: ["Node.js", "Express", "PostgreSQL", "SaaS"],
-      liveLink: "https://projectpilot.devbyaryan.me/",
-      githubLink: "https://github.com/AFG123/ProjectPilot"
-    },
-    {
-      slug: "snipshare",
-      title: "snipshare",
-      problem: "Sharing code snippets safely needs more than a textbox. Links must expire, sensitive snippets need protection, and abandoned data shouldn't pile up in the database forever.",
-      solution: "Built a full-stack pastebin with short links, expiry, password protection, and burn-after-read. Designed per-endpoint rate limits to prevent abuse, token-based snippet management, and a cron job that cleans up expired snippets every 15 minutes.",
-      techStack: ["Node.js", "Express", "PostgreSQL", "React", "Rate Limiting"],
-      liveLink: "https://www.devbyaryan.me/",
-      githubLink: "https://github.com/AFG123/Snip-share"
-    },
-    {
-      slug: "wedding-website-preview-platform",
-      title: "wedding website preview platform",
-      problem: "A freelance client needed a catalog-style website that could present card designs cleanly while still being easy to manage from the backend.",
-      solution: "Built a PHP-based wedding card preview platform with an admin dashboard, product and category management, reusable backend functions, and an API layer to serve dynamic product content to the frontend.",
-      techStack: ["PHP", "MySQL", "JavaScript", "REST API"],
-      liveLink: "https://houseofcards.in/",
-      githubLink: "https://github.com/AFG123/WebsitePreview"
-    },
-    {
-      slug: "reachinbox-email-scheduler",
-      title: "reachinbox email scheduler",
-      problem: "Scheduling cold email campaigns reliably is difficult when server restarts interrupt cron jobs, and lack of rate-limiting/concurrency control leads to duplicate sending or email provider blocks.",
-      solution: "Built a full-stack email scheduler using BullMQ and Redis for persistent delayed jobs that survive restarts. Implemented Redis-backed hourly rate limiting per sender and database-tracked job states to prevent duplicate processing across concurrent workers. Integrated Google OAuth and a live status dashboard.",
-      techStack: ["TypeScript", "Express.js", "PostgreSQL", "Prisma", "BullMQ", "Redis", "React"],
-      liveLink: "https://reachinbox-email-scheduler-gules.vercel.app",
-      githubLink: "https://github.com/AFG123/reachinbox-email-scheduler"
-    }
-  ];
-
-  const skillCategories = [
-    {
-      category: "Backend & Databases",
-      skills: [
-        { name: "Node.js", highlight: true },
-        { name: "Express.js", highlight: true },
-        { name: "PostgreSQL", highlight: true },
-        { name: "MongoDB", highlight: false },
-        { name: "Redis / BullMQ", highlight: true },
-        { name: "MySQL", highlight: false },
-        { name: "REST APIs", highlight: false },
-        { name: "Schema Design", highlight: false },
-      ]
-    },
-    {
-      category: "Languages & Security",
-      skills: [
-        { name: "TypeScript", highlight: true },
-        { name: "JavaScript", highlight: false },
-        { name: "Java (DSA)", highlight: false },
-        { name: "Python / PHP", highlight: false },
-        { name: "JWT Auth", highlight: false },
-        { name: "RBAC", highlight: true },
-        { name: "MVC Architecture", highlight: false },
-        { name: "Input Validation", highlight: false },
-      ]
-    },
-    {
-      category: "Tools & Frontend",
-      skills: [
-        { name: "React", highlight: true },
-        { name: "Tailwind CSS", highlight: false },
-        { name: "Git & GitHub", highlight: true },
-        { name: "Postman", highlight: false },
-        { name: "Jira", highlight: false },
-        { name: "Linux", highlight: false },
-        { name: "Microsoft Azure", highlight: false },
-        { name: "Vercel", highlight: false },
-      ]
-    }
-  ];
-
-  const scrollToSection = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-  };
-
+type Theme = "dark" | "light";
+const projects = [
+  { slug: "reachinbox-email-scheduler", name: "ReachInbox Email Scheduler", category: "Async systems / Email infrastructure", summary: "A campaign scheduler built around durable delayed jobs, sender limits, and worker-safe delivery states.", detail: "BullMQ stores scheduled jobs in Redis so work can resume after a server restart. Sender limits and database states help coordinate delivery across workers.", stack: ["TypeScript", "Express", "BullMQ", "Redis", "PostgreSQL", "React"], github: "https://github.com/AFG123/reachinbox-email-scheduler", demo: "https://reachinbox-email-scheduler-gules.vercel.app", glyph: "enqueue( )", caption: "JOBS · WORKERS · DELIVERY" },
+  { slug: "projectpilot", name: "ProjectPilot", category: "SaaS / Project generation", summary: "Personalized software project blueprints shaped around a student's skills and target role.", detail: "The platform produces architecture, schema, API, and phased build guidance, with a one-time paid unlock.", stack: ["Node.js", "Express", "PostgreSQL", "Razorpay"], github: "https://github.com/AFG123/ProjectPilot", demo: "https://projectpilot.devbyaryan.me/", glyph: "{ blueprint }", caption: "IDEA · ARCHITECTURE · BUILD" },
+  { slug: "snipshare", name: "SnipShare", category: "Security / Data lifecycle", summary: "Share snippets with expiry, password protection, and burn-after-read access.", detail: "A PostgreSQL transaction wraps burn-after-read access so concurrent requests cannot consume the same snippet twice.", stack: ["Node.js", "Express", "PostgreSQL", "React"], github: "https://github.com/AFG123/Snip-share", demo: "https://www.devbyaryan.me/", glyph: "< / >", caption: "CREATE · PROTECT · EXPIRE" },
+  { slug: "sweety", name: "Sweety", category: "Health data / API design", summary: "A blood glucose tracker for daily readings and date-based reports.", detail: "Patients can log up to four readings per day. Its Express API handles authenticated reading management and daily, month-to-date, and monthly reports.", stack: ["React", "TypeScript", "Express", "PostgreSQL"], github: "https://github.com/AFG123/Sweety-Blood-Glucose-Tracker", demo: null, glyph: "40–600", caption: "READINGS · VALIDATION · REPORTS" },
+];
+const workflow = [
+  { label: "React form", type: "CLIENT", description: "A visitor submits a name, email, and message from the contact form." },
+  { label: "Express route", type: "API", description: "POST /api/contact receives the JSON request and passes it through the contact route." },
+  { label: "Validation + limit", type: "BOUNDARY", description: "The route limits requests by IP; the controller checks name, email, and message before saving." },
+  { label: "PostgreSQL", type: "DATA", description: "The service inserts a contact message through a database query and returns a success response." },
+];
+const skills = [
+  { title: "Backend & APIs", items: ["Node.js", "Express.js", "REST API design", "TypeScript", "PHP", "Python"] },
+  { title: "Data & async", items: ["PostgreSQL", "MySQL", "MongoDB", "Redis", "BullMQ", "Schema design"] },
+  { title: "Security & tools", items: ["JWT", "RBAC", "Input validation", "Git & GitHub", "Postman", "Linux"] },
+];
+function Reveal({ children, className = "" }: { children: ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    void trackPortfolioEvent({
-      eventType: "page_view",
-      path: window.location.pathname,
-      metadata: {
-        referrer: document.referrer || null,
-      },
-    });
+    const element = ref.current;
+    if (!element || !("IntersectionObserver" in window)) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { element.classList.add("is-visible"); observer.disconnect(); }
+    }, { threshold: 0.09 });
+    observer.observe(element);
+    return () => observer.disconnect();
   }, []);
-
-  return (
-    <div className="min-h-screen bg-black text-gray-300">
-      {/* Terminal Header */}
-      <header className="border-b border-[#00ff41]/20 bg-black/90 sticky top-0 z-50 backdrop-blur-sm">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Terminal className="w-5 h-5 text-[#00ff41]" />
-            <span className="font-mono text-sm text-[#00ff41]">~/portfolio</span>
-          </div>
-          <nav className="hidden md:flex gap-6">
-            {["about", "projects", "architecture", "skills", "contact"].map((section) => (
-              <button
-                key={section}
-                onClick={() => scrollToSection(section)}
-                className="font-mono text-sm text-gray-400 hover:text-[#00ff41] transition-colors"
-              >
-                {section}
-              </button>
-            ))}
-          </nav>
-        </div>
-      </header>
-
-      {/* Hero Section */}
-      <section className="min-h-[90vh] flex flex-col items-center justify-center px-6 relative">
-        <div className="max-w-3xl w-full">
-          <div className="mb-12 space-y-2">
-            <div className="font-mono text-sm">
-              <span className="text-[#00ff41]/60">$ </span>
-              <span className="text-gray-400">whoami</span>
-            </div>
-            <h1 className="font-mono text-xl text-white pl-2">
-              Aryan Damai
-            </h1>
-
-            <div className="font-mono text-sm mt-4">
-              <span className="text-[#00ff41]/60">$ </span>
-              <span className="text-gray-400">current_focus</span>
-            </div>
-            <div className="font-mono text-xl text-white pl-2">
-              Building scalable backend systems
-            </div>
-
-            <div className="font-mono text-sm text-[#00ff41]/60 pl-0 pt-2">
-              $ _
-            </div>
-          </div>
-
-          <SystemStats />
-
-          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <button
-              onClick={() => scrollToSection("projects")}
-              className="font-mono px-6 py-3 border-2 border-[#00ff41] text-[#00ff41] hover:bg-[#00ff41] hover:text-black transition-all"
-            >
-              View Projects
-            </button>
-
-            <a
-              href="/resume.pdf"
-              download
-              onClick={() => {
-                void trackResumeDownload("hero");
-              }}
-              className="inline-flex items-center gap-2 font-mono px-6 py-3 border border-[#00ff41]/40 text-gray-300 hover:bg-[#00ff41]/10 hover:border-[#00ff41] hover:text-[#00ff41] transition-all"
-            >
-              <Download className="w-4 h-4" />
-              <span>Download Resume</span>
-            </a>
-          </div>
-        </div>
-        <button
-          onClick={() => scrollToSection("about")}
-          className="absolute bottom-8 text-[#00ff41]/40 hover:text-[#00ff41]/80 transition-colors"
-        >
-          <ChevronDown className="w-6 h-6 animate-bounce" />
-        </button>
-      </section>
-
-      {/* About Section */}
-      <section id="about" className="py-20 px-6 border-t border-[#00ff41]/10">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="font-mono text-2xl text-[#00ff41] mb-8">
-            <span className="text-[#00ff41]/60">$</span> cat about.txt
-          </h2>
-          <div className="max-w-2xl space-y-5 font-mono text-base leading-8 text-gray-400">
-            <p>
-              I&apos;m a backend developer focused on <span className="text-[#00ff41]">building systems that solve real problems</span>. I care about how data moves, how components interact, and whether the software still makes sense once it grows beyond the first version.
-            </p>
-
-            <p>
-              Most of my work is around APIs, backend flows, database-driven applications, and the logic behind admin and user-facing systems. I like building software that is clear in structure, practical in use, and maintainable over time.
-            </p>
-
-            <p>
-              I&apos;m self-taught, so the way I learned was by building, breaking, and refining projects until they worked the way they should. That process shaped how I approach engineering: stay curious, keep the fundamentals strong, and build things that hold up in practice.
-            </p>
-
-            <p className="text-white">
-              I&apos;m interested in backend roles where reliability, structure, and thoughtful problem-solving matter.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Projects Section */}
-      <section id="projects" className="py-20 px-6 border-t border-[#00ff41]/10">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="font-mono text-2xl text-[#00ff41] mb-8">
-            <span className="text-[#00ff41]/60">$</span> ls projects/
-          </h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            {projects.map((project, index) => (
-              <ProjectCard key={index} {...project} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Architecture Section */}
-      <ArchitectureSection />
-
-      {/* Skills Section */}
-      <section id="skills" className="py-20 px-6 border-t border-[#00ff41]/10">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="font-mono text-2xl text-[#00ff41] mb-8">
-            <span className="text-[#00ff41]/60">$</span> grep skills
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {skillCategories.map((category, index) => (
-              <SkillCategory key={index} {...category} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Contact Section */}
-      <section id="contact" className="py-20 px-6 border-t border-[#00ff41]/10">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="font-mono text-2xl text-[#00ff41] mb-4">
-            <span className="text-[#00ff41]/60">$</span> ./contact.sh
-          </h2>
-
-          <div className="mb-6 p-4 border border-[#00ff41]/30 bg-[#00ff41]/5">
-            <p className="font-mono text-sm text-[#00ff41]">
-              Open to opportunities
-            </p>
-          </div>
-
-          <p className="mb-8 font-mono text-gray-400">
-            Open to interesting projects and collaborations. Let&apos;s build something.
-          </p>
-
-          <ContactForm />
-
-          <div className="flex flex-wrap gap-4">
-            <a
-              href="mailto:aryan123damai@gmail.com"
-              className="flex items-center gap-2 font-mono px-5 py-3 border-2 border-[#00ff41] text-[#00ff41] hover:bg-[#00ff41] hover:text-black transition-all"
-            >
-              <Mail className="w-4 h-4" />
-              <span>Email Me</span>
-            </a>
-            <a
-              href="https://github.com/AFG123"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 font-mono px-5 py-3 border border-[#00ff41]/40 text-gray-300 hover:bg-[#00ff41]/10 hover:border-[#00ff41] hover:text-[#00ff41] transition-all"
-            >
-              <Github className="w-4 h-4" />
-              <span>GitHub</span>
-            </a>
-            <a
-              href="https://www.linkedin.com/in/aryan-damai"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 font-mono px-5 py-3 border border-[#00ff41]/40 text-gray-300 hover:bg-[#00ff41]/10 hover:border-[#00ff41] hover:text-[#00ff41] transition-all"
-            >
-              <Linkedin className="w-4 h-4" />
-              <span>LinkedIn</span>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="border-t border-[#00ff41]/10 py-8 px-6">
-        <div className="max-w-5xl mx-auto text-center">
-          <p className="font-mono text-sm text-gray-600">
-            A portfolio powered by real APIs, tracking, and PostgreSQL
-          </p>
-        </div>
-      </footer>
+  return <div ref={ref} className={`reveal ${className}`}>{children}</div>;
+}
+function trackProject(slug: string, target: string, linkType: "github" | "live") {
+  void trackPortfolioEvent({ eventType: "project_click", path: window.location.pathname, projectSlug: slug, metadata: { target, linkType } });
+}
+function ArchitectureVisual() {
+  const [active, setActive] = useState(0);
+  const [playing, setPlaying] = useState(false);
+  const [hovered, setHovered] = useState<number | null>(null);
+  const [runId, setRunId] = useState(0);
+  useEffect(() => {
+    if (!playing) return;
+    const timer = window.setTimeout(() => {
+      if (active === workflow.length - 1) setPlaying(false);
+      else setActive(active + 1);
+    }, 1450);
+    return () => window.clearTimeout(timer);
+  }, [playing, active, runId]);
+  const progressStyle = { "--signal-step": active } as CSSProperties;
+  const visibleTip = hovered ?? (playing ? active : null);
+  return <div className="architecture-panel" aria-label="Interactive walkthrough of this portfolio's contact API">
+    <div className="panel-topline"><span className="live-pip" /> SYSTEM WALKTHROUGH <span className="panel-topline-right">PORTFOLIO / CONTACT</span></div>
+    <div className="architecture-heading"><div><span className="eyebrow">VERIFIED WORKFLOW</span><h2>From message to database.</h2></div><span className="flow-method">POST /api/contact</span></div>
+    <div className={`signal-rail ${playing ? "is-playing" : ""}`} style={progressStyle} aria-hidden="true"><span className="signal-line" /><span className="signal-progress" /><span className="signal-packet"><span /></span></div>
+    <div className="flow-track" role="group" aria-label="Contact API stages">{workflow.map((step, index) => <div className="flow-unit" key={step.label} onMouseEnter={() => setHovered(index)} onMouseLeave={() => setHovered(null)}><div className={`flow-node ${active === index ? "active" : ""}`} role="group" tabIndex={0} aria-label={`Step ${index + 1}: ${step.label}`} aria-describedby={`flow-tip-${index}`} onFocus={(event) => { if (event.currentTarget.matches(":focus-visible")) setHovered(index); }} onBlur={() => setHovered(null)}><span className="flow-node-type">{step.type}</span><span className="flow-node-label">{step.label}</span><span className="flow-node-index">0{index + 1}</span></div><span className={`flow-tooltip ${visibleTip === index ? "is-visible" : ""}`} id={`flow-tip-${index}`} role="tooltip"><strong>{step.label}</strong><span>{step.description}</span></span>{index < workflow.length - 1 && <span className={`flow-connector ${active > index ? "passed" : ""}`} aria-hidden="true"><span /></span>}</div>)}</div>
+    <div className="flow-controls" aria-label="Walkthrough controls"><button type="button" onClick={() => { if (active === workflow.length - 1) setActive(0); setPlaying(true); }} disabled={playing} aria-label="Play walkthrough"><Play size={14} /> Play</button><button type="button" onClick={() => setPlaying(false)} disabled={!playing} aria-label="Pause walkthrough"><Pause size={14} /> Pause</button><button type="button" onClick={() => { setActive(0); setPlaying(true); setRunId((id) => id + 1); }} aria-label="Replay walkthrough"><RotateCcw size={14} /> Replay</button></div>
+    <div className="panel-footer"><span>REQUEST → VALIDATE → STORE</span><span>HOVER OR FOCUS A STAGE <ArrowUpRight size={13} /></span></div>
+  </div>;
+}
+function Welcome({ onClose }: { onClose: () => void }) {
+  const [exiting, setExiting] = useState(false);
+  const closeRef = useRef(onClose);
+  const skipTimer = useRef<number | null>(null);
+  closeRef.current = onClose;
+  useEffect(() => {
+    const exitTimer = window.setTimeout(() => setExiting(true), 4150);
+    const closeTimer = window.setTimeout(() => closeRef.current(), 4500);
+    return () => { window.clearTimeout(exitTimer); window.clearTimeout(closeTimer); if (skipTimer.current !== null) window.clearTimeout(skipTimer.current); };
+  }, []);
+  return <div className={`welcome-overlay ${exiting ? "is-exiting" : ""}`} role="region" aria-label="Welcome to Aryan Damai's portfolio">
+    <button className="welcome-skip" type="button" onClick={() => { setExiting(true); skipTimer.current = window.setTimeout(() => closeRef.current(), 350); }}>Skip intro <ArrowUpRight size={15} /></button>
+    <div className="welcome-content"><div className="welcome-identity"><span className="welcome-mark">AD<span>.</span></span><span className="welcome-name">ARYAN DAMAI <small>BACKEND DEVELOPER</small></span></div>
+      <svg className="welcome-network" viewBox="0 0 420 110" role="img" aria-label="Connected client, API, and database nodes">
+        <path className="network-path path-one" d="M48 55 H210" /><path className="network-path path-two" d="M210 55 H372" />
+        {[48, 210, 372].map((cx, index) => <g className={`network-node node-${index}`} key={cx}><circle cx={cx} cy="55" r="20" /><circle cx={cx} cy="55" r="4" /></g>)}
+        <text x="48" y="98" textAnchor="middle">CLIENT</text><text x="210" y="98" textAnchor="middle">API</text><text x="372" y="98" textAnchor="middle">DATA</text>
+      </svg><p>Building systems that make sense.</p>
     </div>
-  );
+  </div>;
+}
+function ProjectLinks({ project }: { project: typeof projects[number] }) {
+  return <div className="project-links"><a href={project.github} target="_blank" rel="noopener noreferrer" onClick={() => trackProject(project.slug, project.github, "github")}><Github size={16} /> GitHub <ArrowUpRight size={15} /></a>{project.demo && <a href={project.demo} target="_blank" rel="noopener noreferrer" onClick={() => trackProject(project.slug, project.demo!, "live")}>Live demo <ArrowUpRight size={15} /></a>}</div>;
+}
+export default function App() {
+  const [theme, setTheme] = useState<Theme>(() => { try { return localStorage.getItem("portfolio-theme") === "light" ? "light" : "dark"; } catch { return "dark"; } });
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(() => { try { return sessionStorage.getItem("portfolio-welcomed") !== "1" && !window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch { return false; } });
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", theme === "dark" ? "#080e19" : "#f4f7fb");
+    try { localStorage.setItem("portfolio-theme", theme); } catch { /* Storage can be unavailable. */ }
+  }, [theme]);
+  function toggleTheme() {
+    const next: Theme = theme === "dark" ? "light" : "dark";
+    const root = document.documentElement;
+    const applyTheme = () => { root.dataset.theme = next; flushSync(() => setTheme(next)); };
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { applyTheme(); return; }
+    const viewDocument = document as Document & { startViewTransition?: (callback: () => void) => unknown };
+    if (viewDocument.startViewTransition) {
+      viewDocument.startViewTransition(applyTheme);
+    } else {
+      root.classList.add("theme-changing");
+      applyTheme();
+      window.setTimeout(() => root.classList.remove("theme-changing"), 400);
+    }
+  }
+  useEffect(() => { void trackPortfolioEvent({ eventType: "page_view", path: window.location.pathname, metadata: { referrer: document.referrer || null } }); }, []);
+  function dismissWelcome() { setShowWelcome(false); try { sessionStorage.setItem("portfolio-welcomed", "1"); } catch { /* Continue without storage. */ } }
+  const nav = [{ label: "Home", href: "#home" }, { label: "About", href: "#about" }, { label: "Experience", href: "#experience" }, { label: "Projects", href: "#projects" }, { label: "Skills", href: "#skills" }, { label: "Contact", href: "#contact" }];
+  return <div className="site-shell" id="home">
+    <a className="skip-link" href="#main">Skip to content</a>{showWelcome && <Welcome onClose={dismissWelcome} />}
+    <header className="site-header"><div className="header-inner container"><a className="brand" href="#home" aria-label="Aryan Damai, home">AD<span>.</span><span className="brand-caption">ARYAN DAMAI <small>BACKEND ENGINEER</small></span></a><nav className={`site-nav ${menuOpen ? "open" : ""}`} aria-label="Primary navigation">{nav.map((item) => <a key={item.label} href={item.href} onClick={() => setMenuOpen(false)}>{item.label}</a>)}<a className="nav-resume" href="/resume.pdf" download onClick={() => void trackResumeDownload("navigation")}>Resume <ArrowUpRight size={14} /></a></nav><div className="header-actions"><button className="theme-toggle icon-button" type="button" onClick={toggleTheme} aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}>{theme === "dark" ? <Sun size={19} /> : <Moon size={19} />}</button><button className="mobile-menu icon-button" type="button" onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? "Close menu" : "Open menu"} aria-expanded={menuOpen}>{menuOpen ? <X size={20} /> : <Menu size={20} />}</button></div></div></header>
+    <main id="main">
+      <section className="hero container"><div className="hero-copy"><div className="availability"><span className="availability-dot" /> OPEN TO BACKEND OPPORTUNITIES <span className="availability-line" /></div><p className="hero-kicker">HI, I'M ARYAN DAMAI</p><h1>I build the systems <em>behind</em> great products.</h1><p className="hero-lede">Backend developer working across APIs, databases, and reliable workflows. I turn complex requirements into systems that are clear to use and maintain.</p><div className="hero-actions"><a className="button button-primary" href="#projects">Explore my work <ArrowUpRight size={18} /></a><a className="button button-secondary" href="/resume.pdf" download onClick={() => void trackResumeDownload("hero")}>Download resume <Download size={17} /></a></div><div className="hero-meta"><span>BASED IN BENGALURU, INDIA</span><span>SCROLL TO EXPLORE <ChevronDown size={14} /></span></div></div><ArchitectureVisual /></section>
+      <section className="stats-strip container" aria-label="Live portfolio statistics"><SystemStats /></section>
+      <section className="section about-section" id="about"><div className="container section-grid"><Reveal className="section-intro"><span className="eyebrow"><span className="eyebrow-line" /> 01 / ABOUT</span><h2>Engineering with<br /><em>intent.</em></h2></Reveal><Reveal className="about-content"><p className="large-copy">I focus on the parts of software that have to keep working after the first demo: data models, API boundaries, permissions, and background work.</p><p>My work spans production sports software, client systems, and independent products. I enjoy making complex flows understandable, choosing practical tools, and building a foundation others can extend.</p><div className="about-signals"><span><Check size={16} /> Production API experience</span><span><Check size={16} /> Database-first thinking</span><span><Check size={16} /> Full-stack collaboration</span></div></Reveal></div></section>
+      <section className="section experience-section" id="experience"><div className="container"><Reveal className="section-heading"><div><span className="eyebrow"><span className="eyebrow-line" /> 02 / EXPERIENCE</span><h2>Where I've built.</h2></div><p>Real products, real constraints, and the engineering decisions that connect them.</p></Reveal><Reveal className="experience-list"><article className="experience-item"><div className="experience-date">FEB — JUN 2026</div><div><h3>Backend Developer Intern <span>↗</span></h3><p className="experience-company">Jeffs Group of Companies · SportERP / NexSport</p><p>Built and maintained REST APIs across athlete, event, scoring, and registration modules. Worked on a MongoDB to PostgreSQL migration and role-based access controls for a sports ERP platform.</p><div className="tag-row"><span>Node.js</span><span>PostgreSQL</span><span>JWT / RBAC</span><span>REST APIs</span></div></div></article><article className="experience-item"><div className="experience-date">JAN 2024 — JAN 2026</div><div><h3>Freelance Backend Developer <span>↗</span></h3><p className="experience-company">Independent client work</p><p>Delivered backend systems using PHP and Python, including REST APIs, admin dashboards, authentication, and database-driven workflows.</p><div className="tag-row"><span>PHP</span><span>Python</span><span>MySQL</span><span>Client delivery</span></div></div></article></Reveal></div></section>
+      <section className="section projects-section" id="projects"><div className="container"><Reveal className="section-heading"><div><span className="eyebrow"><span className="eyebrow-line" /> 03 / SELECTED WORK</span><h2>Featured projects<span className="accent-dot">.</span></h2></div><p>Four projects, each centered on a different backend problem.</p></Reveal><div className="project-grid">{projects.map((project, index) => <Reveal className={`project-card ${index < 2 ? "project-card-featured" : ""}`} key={project.slug}><div className="project-card-top"><span>0{index + 1} / {project.category}</span><span className="project-card-icon"><ArrowUpRight size={20} /></span></div><div className="project-visual" aria-hidden="true"><span className={`project-glyph glyph-${index}`}>{project.glyph}</span><span className="project-visual-caption">{project.caption}</span></div><div className="project-card-body"><h3>{project.name}</h3><p className="project-summary">{project.summary}</p><p className="project-detail">{project.detail}</p><div className="tag-row">{project.stack.map((item) => <span key={item}>{item}</span>)}</div><ProjectLinks project={project} /></div></Reveal>)}</div></div></section>
+      <section className="section skills-section" id="skills"><div className="container section-grid"><Reveal className="section-intro"><span className="eyebrow"><span className="eyebrow-line" /> 04 / TOOLKIT</span><h2>Tools for the<br /><em>right problem.</em></h2><p>Technologies I use to design, ship, and maintain backend systems.</p></Reveal><Reveal className="skill-groups">{skills.map((group) => <div className="skill-group" key={group.title}><h3>{group.title}</h3><div className="skill-list">{group.items.map((item) => <span key={item}>{item}</span>)}</div></div>)}</Reveal></div></section>
+      <section className="section writing-section" id="writing"><div className="container"><Reveal className="writing-panel"><div><span className="eyebrow"><span className="eyebrow-line" /> 05 / WRITING</span><h2>Notes from the build.</h2><p>Technical writing on backend architecture and the decisions behind my projects is coming soon.</p></div><span className="coming-soon">COMING SOON <span>✦</span></span></Reveal></div></section>
+      <section className="section contact-section" id="contact"><div className="container contact-grid"><Reveal><span className="eyebrow"><span className="eyebrow-line" /> 06 / CONTACT</span><h2>Let's build something <em>that lasts.</em></h2><p>Have a backend role, a product problem, or a project in mind? Send me a note and I’ll get back to you.</p><div className="contact-links"><a href="mailto:aryan123damai@gmail.com"><Mail size={17} /> aryan123damai@gmail.com</a><a href="https://github.com/AFG123" target="_blank" rel="noopener noreferrer"><Github size={17} /> GitHub <ArrowUpRight size={14} /></a><a href="https://www.linkedin.com/in/aryan-damai" target="_blank" rel="noopener noreferrer"><Linkedin size={17} /> LinkedIn <ArrowUpRight size={14} /></a></div></Reveal><Reveal className="contact-form-wrap"><ContactForm /></Reveal></div></section>
+    </main><footer className="site-footer"><div className="container footer-inner"><span className="footer-brand">AD<span>.</span></span><p>Designed and built by Aryan Damai.</p><a href="#home">Back to top ↑</a></div></footer>
+  </div>;
 }

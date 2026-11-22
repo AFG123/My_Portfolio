@@ -4,9 +4,9 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "start": "vite",
-    "build": "vite build"
+    "dev": "vite --configLoader runner",
+    "start": "vite --configLoader runner",
+    "build": "vite build --configLoader runner"
   },
   "dependencies": {
     "lucide-react": "0.487.0",
