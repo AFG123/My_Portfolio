@@ -1,5 +1,22 @@
 import ReactDOM from "react-dom/client";
+import { createBrowserRouter, RouterProvider } from "react-router";
 import App from "./app/App";
+import { SiteLayout } from "./app/SiteLayout";
+import { ProjectsPage } from "./app/pages/ProjectsPage";
+import { ProjectDetailPage } from "./app/pages/ProjectDetailPage";
+import { NotFoundPage } from "./app/pages/NotFoundPage";
 import "./styles/index.css";
+import "./styles/homepage.css";
+import "./styles/projects.css";
 
-ReactDOM.createRoot(document.getElementById("root")!).render(<App />);
+const router = createBrowserRouter([{
+  element: <SiteLayout />,
+  children: [
+    { path: "/", element: <App /> },
+    { path: "/projects", element: <ProjectsPage /> },
+    { path: "/projects/:slug", element: <ProjectDetailPage /> },
+    { path: "*", element: <NotFoundPage /> },
+  ],
+}]);
+
+ReactDOM.createRoot(document.getElementById("root")!).render(<RouterProvider router={router} />);

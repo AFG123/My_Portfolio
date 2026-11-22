@@ -1,18 +1,10 @@
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import { flushSync } from "react-dom";
-import { ArrowUpRight, Check, ChevronDown, Download, Github, Linkedin, Mail, Menu, Moon, Pause, Play, RotateCcw, Sun, X } from "lucide-react";
+import { Link } from "react-router";
+import { ArrowUpRight, Check, ChevronDown, Download, Github, Linkedin, Mail, Pause, Play, RotateCcw } from "lucide-react";
 import { trackPortfolioEvent, trackResumeDownload } from "../lib/api";
+import { projects, type PortfolioProject } from "../data/projects";
 import { ContactForm } from "./components/ContactForm";
 import { SystemStats } from "./components/SystemStats";
-import "../styles/homepage.css";
-
-type Theme = "dark" | "light";
-const projects = [
-  { slug: "reachinbox-email-scheduler", name: "ReachInbox Email Scheduler", category: "Async systems / Email infrastructure", summary: "A campaign scheduler built around durable delayed jobs, sender limits, and worker-safe delivery states.", detail: "BullMQ stores scheduled jobs in Redis so work can resume after a server restart. Sender limits and database states help coordinate delivery across workers.", stack: ["TypeScript", "Express", "BullMQ", "Redis", "PostgreSQL", "React"], github: "https://github.com/AFG123/reachinbox-email-scheduler", demo: "https://reachinbox-email-scheduler-gules.vercel.app", glyph: "enqueue( )", caption: "JOBS · WORKERS · DELIVERY" },
-  { slug: "projectpilot", name: "ProjectPilot", category: "SaaS / Project generation", summary: "Personalized software project blueprints shaped around a student's skills and target role.", detail: "The platform produces architecture, schema, API, and phased build guidance, with a one-time paid unlock.", stack: ["Node.js", "Express", "PostgreSQL", "Razorpay"], github: "https://github.com/AFG123/ProjectPilot", demo: "https://projectpilot.devbyaryan.me/", glyph: "{ blueprint }", caption: "IDEA · ARCHITECTURE · BUILD" },
-  { slug: "snipshare", name: "SnipShare", category: "Security / Data lifecycle", summary: "Share snippets with expiry, password protection, and burn-after-read access.", detail: "A PostgreSQL transaction wraps burn-after-read access so concurrent requests cannot consume the same snippet twice.", stack: ["Node.js", "Express", "PostgreSQL", "React"], github: "https://github.com/AFG123/Snip-share", demo: "https://www.devbyaryan.me/", glyph: "< / >", caption: "CREATE · PROTECT · EXPIRE" },
-  { slug: "sweety", name: "Sweety", category: "Health data / API design", summary: "A blood glucose tracker for daily readings and date-based reports.", detail: "Patients can log up to four readings per day. Its Express API handles authenticated reading management and daily, month-to-date, and monthly reports.", stack: ["React", "TypeScript", "Express", "PostgreSQL"], github: "https://github.com/AFG123/Sweety-Blood-Glucose-Tracker", demo: null, glyph: "40–600", caption: "READINGS · VALIDATION · REPORTS" },
-];
 const workflow = [
   { label: "React form", type: "CLIENT", description: "A visitor submits a name, email, and message from the contact form." },
   { label: "Express route", type: "API", description: "POST /api/contact receives the JSON request and passes it through the contact route." },
@@ -70,8 +62,8 @@ function Welcome({ onClose }: { onClose: () => void }) {
   const skipTimer = useRef<number | null>(null);
   closeRef.current = onClose;
   useEffect(() => {
-    const exitTimer = window.setTimeout(() => setExiting(true), 4150);
-    const closeTimer = window.setTimeout(() => closeRef.current(), 4500);
+    const exitTimer = window.setTimeout(() => setExiting(true), 2050);
+    const closeTimer = window.setTimeout(() => closeRef.current(), 2400);
     return () => { window.clearTimeout(exitTimer); window.clearTimeout(closeTimer); if (skipTimer.current !== null) window.clearTimeout(skipTimer.current); };
   }, []);
   return <div className={`welcome-overlay ${exiting ? "is-exiting" : ""}`} role="region" aria-label="Welcome to Aryan Damai's portfolio">
@@ -85,38 +77,18 @@ function Welcome({ onClose }: { onClose: () => void }) {
     </div>
   </div>;
 }
-function ProjectLinks({ project }: { project: typeof projects[number] }) {
-  return <div className="project-links"><a href={project.github} target="_blank" rel="noopener noreferrer" onClick={() => trackProject(project.slug, project.github, "github")}><Github size={16} /> GitHub <ArrowUpRight size={15} /></a>{project.demo && <a href={project.demo} target="_blank" rel="noopener noreferrer" onClick={() => trackProject(project.slug, project.demo!, "live")}>Live demo <ArrowUpRight size={15} /></a>}</div>;
+function ProjectLinks({ project }: { project: PortfolioProject }) {
+  return <div className="project-links">{project.slug === "reachinbox-email-scheduler" && <Link to={`/projects/${project.slug}`}>Case study <ArrowUpRight size={15} /></Link>}<a href={project.github} target="_blank" rel="noopener noreferrer" onClick={() => trackProject(project.slug, project.github, "github")}><Github size={16} /> GitHub <ArrowUpRight size={15} /></a>{project.demo && <a href={project.demo} target="_blank" rel="noopener noreferrer" onClick={() => trackProject(project.slug, project.demo!, "live")}>Live demo <ArrowUpRight size={15} /></a>}</div>;
 }
 export default function App() {
-  const [theme, setTheme] = useState<Theme>(() => { try { return localStorage.getItem("portfolio-theme") === "light" ? "light" : "dark"; } catch { return "dark"; } });
-  const [menuOpen, setMenuOpen] = useState(false);
   const [showWelcome, setShowWelcome] = useState(() => { try { return sessionStorage.getItem("portfolio-welcomed") !== "1" && !window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch { return false; } });
   useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", theme === "dark" ? "#080e19" : "#f4f7fb");
-    try { localStorage.setItem("portfolio-theme", theme); } catch { /* Storage can be unavailable. */ }
-  }, [theme]);
-  function toggleTheme() {
-    const next: Theme = theme === "dark" ? "light" : "dark";
-    const root = document.documentElement;
-    const applyTheme = () => { root.dataset.theme = next; flushSync(() => setTheme(next)); };
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { applyTheme(); return; }
-    const viewDocument = document as Document & { startViewTransition?: (callback: () => void) => unknown };
-    if (viewDocument.startViewTransition) {
-      viewDocument.startViewTransition(applyTheme);
-    } else {
-      root.classList.add("theme-changing");
-      applyTheme();
-      window.setTimeout(() => root.classList.remove("theme-changing"), 400);
-    }
-  }
-  useEffect(() => { void trackPortfolioEvent({ eventType: "page_view", path: window.location.pathname, metadata: { referrer: document.referrer || null } }); }, []);
+    document.title = "Aryan Damai — Backend Developer";
+    document.querySelector('meta[name="description"]')?.setAttribute("content", "Aryan Damai is a backend developer building APIs, database-driven products, and reliable workflows with Node.js, Express, and PostgreSQL.");
+    void trackPortfolioEvent({ eventType: "page_view", path: window.location.pathname, metadata: { referrer: document.referrer || null } });
+  }, []);
   function dismissWelcome() { setShowWelcome(false); try { sessionStorage.setItem("portfolio-welcomed", "1"); } catch { /* Continue without storage. */ } }
-  const nav = [{ label: "Home", href: "#home" }, { label: "About", href: "#about" }, { label: "Experience", href: "#experience" }, { label: "Projects", href: "#projects" }, { label: "Skills", href: "#skills" }, { label: "Contact", href: "#contact" }];
-  return <div className="site-shell" id="home">
-    <a className="skip-link" href="#main">Skip to content</a>{showWelcome && <Welcome onClose={dismissWelcome} />}
-    <header className="site-header"><div className="header-inner container"><a className="brand" href="#home" aria-label="Aryan Damai, home">AD<span>.</span><span className="brand-caption">ARYAN DAMAI <small>BACKEND ENGINEER</small></span></a><nav className={`site-nav ${menuOpen ? "open" : ""}`} aria-label="Primary navigation">{nav.map((item) => <a key={item.label} href={item.href} onClick={() => setMenuOpen(false)}>{item.label}</a>)}<a className="nav-resume" href="/resume.pdf" download onClick={() => void trackResumeDownload("navigation")}>Resume <ArrowUpRight size={14} /></a></nav><div className="header-actions"><button className="theme-toggle icon-button" type="button" onClick={toggleTheme} aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}>{theme === "dark" ? <Sun size={19} /> : <Moon size={19} />}</button><button className="mobile-menu icon-button" type="button" onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? "Close menu" : "Open menu"} aria-expanded={menuOpen}>{menuOpen ? <X size={20} /> : <Menu size={20} />}</button></div></div></header>
+  return <>{showWelcome && <Welcome onClose={dismissWelcome} />}
     <main id="main">
       <section className="hero container"><div className="hero-copy"><div className="availability"><span className="availability-dot" /> OPEN TO BACKEND OPPORTUNITIES <span className="availability-line" /></div><p className="hero-kicker">HI, I'M ARYAN DAMAI</p><h1>I build the systems <em>behind</em> great products.</h1><p className="hero-lede">Backend developer working across APIs, databases, and reliable workflows. I turn complex requirements into systems that are clear to use and maintain.</p><div className="hero-actions"><a className="button button-primary" href="#projects">Explore my work <ArrowUpRight size={18} /></a><a className="button button-secondary" href="/resume.pdf" download onClick={() => void trackResumeDownload("hero")}>Download resume <Download size={17} /></a></div><div className="hero-meta"><span>BASED IN BENGALURU, INDIA</span><span>SCROLL TO EXPLORE <ChevronDown size={14} /></span></div></div><ArchitectureVisual /></section>
       <section className="stats-strip container" aria-label="Live portfolio statistics"><SystemStats /></section>
@@ -126,6 +98,6 @@ export default function App() {
       <section className="section skills-section" id="skills"><div className="container section-grid"><Reveal className="section-intro"><span className="eyebrow"><span className="eyebrow-line" /> 04 / TOOLKIT</span><h2>Tools for the<br /><em>right problem.</em></h2><p>Technologies I use to design, ship, and maintain backend systems.</p></Reveal><Reveal className="skill-groups">{skills.map((group) => <div className="skill-group" key={group.title}><h3>{group.title}</h3><div className="skill-list">{group.items.map((item) => <span key={item}>{item}</span>)}</div></div>)}</Reveal></div></section>
       <section className="section writing-section" id="writing"><div className="container"><Reveal className="writing-panel"><div><span className="eyebrow"><span className="eyebrow-line" /> 05 / WRITING</span><h2>Notes from the build.</h2><p>Technical writing on backend architecture and the decisions behind my projects is coming soon.</p></div><span className="coming-soon">COMING SOON <span>✦</span></span></Reveal></div></section>
       <section className="section contact-section" id="contact"><div className="container contact-grid"><Reveal><span className="eyebrow"><span className="eyebrow-line" /> 06 / CONTACT</span><h2>Let's build something <em>that lasts.</em></h2><p>Have a backend role, a product problem, or a project in mind? Send me a note and I’ll get back to you.</p><div className="contact-links"><a href="mailto:aryan123damai@gmail.com"><Mail size={17} /> aryan123damai@gmail.com</a><a href="https://github.com/AFG123" target="_blank" rel="noopener noreferrer"><Github size={17} /> GitHub <ArrowUpRight size={14} /></a><a href="https://www.linkedin.com/in/aryan-damai" target="_blank" rel="noopener noreferrer"><Linkedin size={17} /> LinkedIn <ArrowUpRight size={14} /></a></div></Reveal><Reveal className="contact-form-wrap"><ContactForm /></Reveal></div></section>
-    </main><footer className="site-footer"><div className="container footer-inner"><span className="footer-brand">AD<span>.</span></span><p>Designed and built by Aryan Damai.</p><a href="#home">Back to top ↑</a></div></footer>
-  </div>;
+    </main>
+  </>;
 }
