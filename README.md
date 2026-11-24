@@ -111,4 +111,18 @@ npm install
 npm run dev      # starts on http://localhost:5173
 ```
 
-The frontend reads `VITE_API_BASE_URL` (defaults to `http://localhost:4000`).
+The frontend reads `VITE_API_BASE_URL` and `VITE_PORTFOLIO_ENV` at build time.
+Copy `frontend/.env.example` to an ignored local `.env` for development. Local
+development defaults to `http://localhost:4000` if no API URL is set; built
+deployments have no localhost fallback.
+
+| Environment | `VITE_PORTFOLIO_ENV` | `VITE_API_BASE_URL` | Contact and analytics |
+| --- | --- | --- | --- |
+| Local development | `development` | `http://localhost:4000` | Enabled only for a local API |
+| Vercel Preview | `preview` | Unset with the current single-origin backend; optionally an HTTPS API origin if CORS explicitly permits the preview origin | Disabled; stats use the offline fallback without an API URL |
+| Vercel Production | `production` | The production backend's HTTPS origin | Enabled |
+
+Set the two variables separately in Vercel Preview and Production. A built
+deployment without `VITE_PORTFOLIO_ENV=production` is read-only. The backend's
+existing `FRONTEND_URL` must match the frontend origin for browser API requests.
+Do not put database credentials or other secrets in `VITE_` variables.
