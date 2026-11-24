@@ -55,6 +55,7 @@ export function SiteLayout() {
           <NavLink to="/" end onClick={() => setMenuOpen(false)}>Home</NavLink>
           {sectionLinks.slice(0, 2).map((item) => <Link key={item.label} to={item.to} onClick={() => setMenuOpen(false)}>{item.label}</Link>)}
           <NavLink to="/projects" onClick={() => setMenuOpen(false)}>Projects</NavLink>
+          <NavLink to="/blog" onClick={() => setMenuOpen(false)}>Blog</NavLink>
           {sectionLinks.slice(2).map((item) => <Link key={item.label} to={item.to} onClick={() => setMenuOpen(false)}>{item.label}</Link>)}
           <a className="nav-resume" href="/resume.pdf" download onClick={() => void trackResumeDownload("navigation")}>Resume <ArrowUpRight size={14} /></a>
         </nav>

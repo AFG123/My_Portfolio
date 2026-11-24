@@ -3,6 +3,11 @@
 
 :root {
   font-family: 'Geist', Inter, system-ui, sans-serif;
+  --type-body: 17px;
+  --type-secondary: 15.5px;
+  --type-control: 14px;
+  --type-label: 12px;
+  --type-diagram: 12.5px;
   color-scheme: dark;
   scroll-behavior: smooth;
 }
