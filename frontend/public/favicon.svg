@@ -1,5 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="10" fill="#000000" />
-  <rect x="2" y="2" width="60" height="60" rx="9" fill="none" stroke="#00ff41" stroke-width="3" opacity="0.7" />
-  <text x="13" y="44" font-family="Consolas, Menlo, monospace" font-size="30" font-weight="bold" fill="#00ff41">&gt;_</text>
+  <rect width="64" height="64" rx="12" fill="#080e19" />
+  <rect x="2" y="2" width="60" height="60" rx="10" fill="none" stroke="#2a4058" stroke-width="2" />
+  <text x="9" y="43" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#f2f6fb">AD</text>
+  <circle cx="52" cy="43" r="4" fill="#66afff" />
 </svg>

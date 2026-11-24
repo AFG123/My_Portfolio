@@ -1,79 +1,36 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { fetchPortfolioStats, type PortfolioStats } from "../../lib/api";
 
-const fallbackStats: PortfolioStats = {
-  portfolioViews: 0,
-  projectClicks: 0,
-  messagesReceived: 0,
-  resumeDownloads: 0,
-  apiStatus: "loading",
-};
-
 export function SystemStats() {
-  const [stats, setStats] = useState<PortfolioStats>(fallbackStats);
-  const [responseTimeMs, setResponseTimeMs] = useState<number | null>(null);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    async function loadStats() {
-      const startedAt = Date.now();
-      try {
-        const data = await fetchPortfolioStats();
-        if (isMounted) {
-          setStats(data);
-          setResponseTimeMs(Date.now() - startedAt);
-        }
-      } catch {
-        if (isMounted) {
-          setStats((current) => ({ ...current, apiStatus: "offline" }));
-        }
-      }
+  const [stats, setStats] = useState<PortfolioStats | null>(null);
+  const [status, setStatus] = useState<"loading" | "online" | "offline">("loading");
+  const [latency, setLatency] = useState<number | null>(null);
+  const mounted = useRef(true);
+  async function loadStats() {
+    setStatus("loading");
+    const start = performance.now();
+    try {
+      const data = await fetchPortfolioStats();
+      if (!mounted.current) return;
+      setStats(data); setLatency(Math.round(performance.now() - start)); setStatus("online");
+    } catch {
+      if (mounted.current) setStatus("offline");
     }
-
+  }
+  useEffect(() => {
+    mounted.current = true;
     void loadStats();
-
-    return () => {
-      isMounted = false;
-    };
+    return () => { mounted.current = false; };
   }, []);
-
   const items = [
-    { label: "portfolio_views", value: stats.portfolioViews },
-    { label: "project_clicks", value: stats.projectClicks },
-    { label: "messages_received", value: stats.messagesReceived },
-    { label: "resume_downloads", value: stats.resumeDownloads },
-    {
-      label: "api_status",
-      value:
-        responseTimeMs === null
-          ? stats.apiStatus
-          : `${stats.apiStatus} · ${responseTimeMs}ms`,
-    },
-  ];
-
-  return (
-    <div className="mt-10 border border-[#00ff41]/20 bg-black/40 p-5">
-      <div className="mb-4 font-mono text-sm text-[#00ff41]/70">
-        <span className="text-[#00ff41]/50">$ </span>
-        system_stats
-      </div>
-
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {items.map((item) => (
-          <div
-            key={item.label}
-            className="border border-[#00ff41]/10 bg-black/70 px-4 py-3"
-          >
-            <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#00ff41]/50">
-              {item.label}
-            </div>
-            <div className="mt-2 font-mono text-lg text-white">
-              {item.value}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+    ["PORTFOLIO VIEWS", stats?.portfolioViews],
+    ["PROJECT CLICKS", stats?.projectClicks],
+    ["MESSAGES RECEIVED", stats?.messagesReceived],
+    ["RESUME DOWNLOADS", stats?.resumeDownloads],
+  ] as const;
+  return <div className="stats-panel">
+    <div className="stats-label"><span className={`status-dot ${status}`} /> LIVE SYSTEM METRICS <span className="stats-status">{status === "loading" ? "CONNECTING..." : status === "online" ? `API ONLINE · ${latency}MS` : "API OFFLINE"}</span></div>
+    {status === "offline" ? <div className="stats-fallback" role="status"><p>Live metrics are taking a break. The rest of the portfolio is ready to explore.</p><button type="button" onClick={() => void loadStats()}>Retry connection</button></div>
+      : <div className="stats-grid">{items.map(([label, value]) => <div className="stat" key={label}><span>{label}</span><strong>{status === "loading" ? "—" : value?.toLocaleString()}</strong></div>)}</div>}
+  </div>;
 }

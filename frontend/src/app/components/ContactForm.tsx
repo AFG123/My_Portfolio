@@ -1,118 +1,30 @@
-import { FormEvent, useState } from "react";
-import { submitContactForm } from "../../lib/api";
+import { type FormEvent, useState } from "react";
+import { ArrowUpRight } from "lucide-react";
+import { ContactSubmissionError, submitContactForm } from "../../lib/api";
+import { contactDisabledMessage, writesEnabled } from "../../lib/runtimeConfig";
 
-const initialFormState = {
-  name: "",
-  email: "",
-  message: "",
-};
-
+const empty = { name: "", email: "", message: "" };
 export function ContactForm() {
-  const [formData, setFormData] = useState(initialFormState);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  const [form, setForm] = useState(empty);
+  const [pending, setPending] = useState(false);
+  const [feedback, setFeedback] = useState<{ ok: boolean; message: string } | null>(null);
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setErrorMessage("");
-    setSuccessMessage("");
-    setIsSubmitting(true);
-
+    if (!writesEnabled || pending) return;
+    setPending(true); setFeedback(null);
     try {
-      const response = await submitContactForm(formData);
-      setSuccessMessage(response.message || "Message sent successfully.");
-      setFormData(initialFormState);
+      const result = await submitContactForm(form);
+      setFeedback({ ok: true, message: result.message || "Message sent successfully." }); setForm(empty);
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "Unable to send your message right now.");
-    } finally {
-      setIsSubmitting(false);
-    }
+      setFeedback({ ok: false, message: error instanceof ContactSubmissionError ? error.message : "Unable to send your message right now." });
+    } finally { setPending(false); }
   }
-
-  return (
-    <div className="mb-8 border border-[#00ff41]/20 bg-black/40 p-6">
-      <div className="mb-4 font-mono text-sm text-[#00ff41]/70">
-        <span className="text-[#00ff41]/50">$ </span>
-        send_message
-      </div>
-
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        <div className="grid gap-4 md:grid-cols-2">
-          <label className="block">
-            <span className="mb-2 block font-mono text-xs uppercase tracking-wider text-[#00ff41]/60">
-              name
-            </span>
-            <input
-              required
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={(event) =>
-                setFormData((current) => ({ ...current, name: event.target.value }))
-              }
-              className="w-full border border-[#00ff41]/30 bg-black px-4 py-3 font-mono text-sm text-gray-200 placeholder:text-gray-600 focus:border-[#00ff41] focus:outline-none"
-              placeholder="Aryan Damai"
-            />
-          </label>
-
-          <label className="block">
-            <span className="mb-2 block font-mono text-xs uppercase tracking-wider text-[#00ff41]/60">
-              email
-            </span>
-            <input
-              required
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={(event) =>
-                setFormData((current) => ({ ...current, email: event.target.value }))
-              }
-              className="w-full border border-[#00ff41]/30 bg-black px-4 py-3 font-mono text-sm text-gray-200 placeholder:text-gray-600 focus:border-[#00ff41] focus:outline-none"
-              placeholder="you@example.com"
-            />
-          </label>
-        </div>
-
-        <label className="block">
-          <span className="mb-2 block font-mono text-xs uppercase tracking-wider text-[#00ff41]/60">
-            message
-          </span>
-          <textarea
-            required
-            name="message"
-            rows={5}
-            value={formData.message}
-            onChange={(event) =>
-              setFormData((current) => ({ ...current, message: event.target.value }))
-            }
-            className="w-full resize-none border border-[#00ff41]/30 bg-black px-4 py-3 font-mono text-sm leading-7 text-gray-200 placeholder:text-gray-600 focus:border-[#00ff41] focus:outline-none"
-            placeholder="Tell me a bit about the project or role."
-          />
-        </label>
-
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="inline-flex items-center justify-center border-2 border-[#00ff41] px-5 py-3 font-mono text-sm text-[#00ff41] transition-all hover:bg-[#00ff41] hover:text-black disabled:cursor-not-allowed disabled:border-[#00ff41]/30 disabled:text-[#00ff41]/40 disabled:hover:bg-transparent disabled:hover:text-[#00ff41]/40"
-          >
-            {isSubmitting ? "Sending..." : "Send Message"}
-          </button>
-
-          <p className="font-mono text-xs text-gray-500">
-            Stored through a custom backend and PostgreSQL.
-          </p>
-        </div>
-
-        {successMessage ? (
-          <p className="font-mono text-sm text-[#00ff41]">{successMessage}</p>
-        ) : null}
-
-        {errorMessage ? (
-          <p className="font-mono text-sm text-red-400">{errorMessage}</p>
-        ) : null}
-      </form>
-    </div>
-  );
+  return <form className="contact-form" onSubmit={submit}>
+    <div className="form-topline"><span>NEW MESSAGE</span><span>01 / 03</span></div>
+    {!writesEnabled && <p className="form-feedback error" role="status">{contactDisabledMessage}</p>}
+    <div className="form-row"><label>Your name<input disabled={!writesEnabled} required minLength={2} maxLength={100} autoComplete="name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="Your name" /></label><label>Email address<input disabled={!writesEnabled} required type="email" maxLength={255} autoComplete="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="you@example.com" /></label></div>
+    <label>Tell me about it<textarea disabled={!writesEnabled} required minLength={10} maxLength={2000} rows={5} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder="A little about the role, project, or idea..." /></label>
+    <div className="form-bottom"><button className="button button-primary" type="submit" disabled={pending || !writesEnabled}>{pending ? "Sending..." : "Send message"} <ArrowUpRight size={18} /></button><span>{writesEnabled ? "Sent through my own API." : "Email link remains available."}</span></div>
+    {feedback && <p className={`form-feedback ${feedback.ok ? "success" : "error"}`} role="status">{feedback.message}</p>}
+  </form>;
 }

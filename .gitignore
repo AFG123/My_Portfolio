@@ -17,3 +17,9 @@ Thumbs.db
 # Personal resume master copies — never commit. The served copy lives at frontend/public/resume.pdf
 /Aryan*.pdf
 HANDOFF.md
+
+# Local design documents and temporary Word files
+*Design*.docx
+*Design*.pdf
+~$*.docx
+~WRL*.tmp

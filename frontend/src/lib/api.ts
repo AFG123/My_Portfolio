@@ -1,6 +1,9 @@
 import { fetchWithRetry } from "./fetchWithRetry";
+import { apiBaseUrl, contactDisabledMessage, writesEnabled } from "./runtimeConfig";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
+export class ContactSubmissionError extends Error {}
+
+const contactFailure = "Unable to send your message right now. Please use the email link instead.";
 
 export interface ContactFormPayload {
   name: string;
@@ -30,31 +33,37 @@ export interface PortfolioStats {
 }
 
 export async function submitContactForm(payload: ContactFormPayload) {
-  const response = await fetchWithRetry(`${API_BASE_URL}/api/contact`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
-  });
+  if (!writesEnabled || !apiBaseUrl) throw new ContactSubmissionError(contactDisabledMessage);
 
-  const data = (await response.json()) as ApiResponse;
+  try {
+    const response = await fetchWithRetry(`${apiBaseUrl}/api/contact`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
 
-  if (!response.ok) {
-    throw new Error(data.error || "Something went wrong while sending your message.");
+    if (response.status === 429) throw new ContactSubmissionError("Too many messages right now. Please try again in a minute.");
+    if (response.status === 400) throw new ContactSubmissionError("Please check your name, email, and message, then try again.");
+    if (!response.ok) throw new ContactSubmissionError(contactFailure);
+
+    const data = (await response.json()) as ApiResponse;
+    if (data.ok !== true) throw new ContactSubmissionError(contactFailure);
+    return { ok: true, message: "Message sent successfully." };
+  } catch (error) {
+    if (error instanceof ContactSubmissionError) throw error;
+    throw new ContactSubmissionError(contactFailure);
   }
-
-  return data;
 }
 
 export async function trackPortfolioEvent(payload: PortfolioEventPayload) {
+  if (!writesEnabled || !apiBaseUrl) return;
   try {
     const route =
       payload.eventType === "page_view"
         ? "/track/page-view"
         : "/track/project-click";
 
-    await fetchWithRetry(`${API_BASE_URL}${route}`, {
+    await fetchWithRetry(`${apiBaseUrl}${route}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -67,7 +76,8 @@ export async function trackPortfolioEvent(payload: PortfolioEventPayload) {
 }
 
 export async function fetchPortfolioStats() {
-  const response = await fetchWithRetry(`${API_BASE_URL}/api/stats`);
+  if (!apiBaseUrl) throw new Error("Portfolio API is not configured.");
+  const response = await fetchWithRetry(`${apiBaseUrl}/api/stats`);
   const data = (await response.json()) as { ok: boolean; data?: PortfolioStats; error?: string };
 
   if (!response.ok || !data.data) {
@@ -78,8 +88,9 @@ export async function fetchPortfolioStats() {
 }
 
 export async function trackResumeDownload(source: string) {
+  if (!writesEnabled || !apiBaseUrl) return;
   try {
-    await fetchWithRetry(`${API_BASE_URL}/track/resume-download`, {
+    await fetchWithRetry(`${apiBaseUrl}/track/resume-download`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -6,7 +6,7 @@
     <title>Aryan Damai — Backend Developer</title>
     <meta
       name="description"
-      content="Self-taught backend developer building APIs and database-driven systems with Node.js, Express, and PostgreSQL. This portfolio runs on a real API with live stats."
+      content="Aryan Damai is a backend developer building APIs, database-driven products, and reliable workflows with Node.js, Express, and PostgreSQL."
     />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="theme-color" content="#000000" />
@@ -17,7 +17,7 @@
     <meta property="og:title" content="Aryan Damai — Backend Developer" />
     <meta
       property="og:description"
-      content="Self-taught backend developer building APIs and database-driven systems with Node.js, Express, and PostgreSQL."
+      content="Explore backend projects, production experience, and the systems behind Aryan Damai's work."
     />
     <meta property="og:image" content="https://aryan-backend-dev.vercel.app/og-image.png" />
     <meta property="og:image:width" content="1200" />
@@ -28,11 +28,14 @@
     <meta name="twitter:title" content="Aryan Damai — Backend Developer" />
     <meta
       name="twitter:description"
-      content="Self-taught backend developer building APIs and database-driven systems with Node.js, Express, and PostgreSQL."
+      content="Explore backend projects, production experience, and the systems behind Aryan Damai's work."
     />
     <meta name="twitter:image" content="https://aryan-backend-dev.vercel.app/og-image.png" />
   </head>
   <body>
+    <script>
+      try { document.documentElement.dataset.theme = localStorage.getItem('portfolio-theme') === 'light' ? 'light' : 'dark'; } catch { document.documentElement.dataset.theme = 'dark'; }
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

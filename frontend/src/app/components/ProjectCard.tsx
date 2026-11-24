@@ -79,6 +79,7 @@ export function ProjectCard({ title, problem, solution, techStack, slug, liveLin
             GitHub
           </a>
         )}
+
       </div>
     </div>
   );
